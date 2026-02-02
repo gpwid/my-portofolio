@@ -3,7 +3,6 @@ import {
   Github,
   Linkedin,
   Download,
-  ChevronDown,
 } from 'lucide-react';
 import { Outlet, Link } from 'react-router-dom';
 import logo from './assets/logogpwid.png';
