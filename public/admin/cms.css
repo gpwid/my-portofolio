@@ -1,0 +1,62 @@
+/* Dark Cyberpunk Theme for Decap CMS */
+:root {
+  --bg-color: #000;
+  --text-color: #e5e7eb;
+  --accent-color: #ef4444; /* Red-500 */
+  --border-color: #333;
+}
+
+/* Global Overrides */
+body, #nc-root {
+  font-family: 'Courier New', Courier, monospace !important;
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+/* Header */
+.netlify-identity-menu {
+    background-color: #111 !important;
+}
+
+/* Sidebar/Collections */
+a[class*="AppHeader-button"] {
+    color: var(--accent-color) !important;
+}
+
+/* Inputs */
+input, textarea, div[class*="EditorControl"] {
+  background-color: #111 !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-color) !important;
+  font-family: 'Courier New', Courier, monospace !important;
+}
+
+/* Buttons */
+button {
+  background-color: var(--border-color) !important;
+  color: white !important;
+  border: none !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+button[class*="Button-primary"] {
+    background-color: var(--accent-color) !important;
+    color: black !important;
+    font-weight: bold;
+}
+
+/* List Items */
+div[class*="CollectionTop"] {
+    background-color: var(--bg-color) !important;
+}
+
+a[class*="Collection-item"] {
+    background-color: #111;
+    border-bottom: 1px solid var(--border-color);
+}
+
+a[class*="Collection-item"]:hover {
+    background-color: #222;
+    color: var(--accent-color) !important;
+}
