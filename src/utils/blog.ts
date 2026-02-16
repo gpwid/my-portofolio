@@ -1,50 +1,44 @@
-import frontMatter from 'front-matter';
+import { client } from '../lib/sanity';
 
 export interface BlogPost {
-    slug: string;
-    title: string;
-    date: string;
-    author: string;
-    thumbnail?: string;
-    description?: string;
-    tags?: string[];
-    body: string; // The raw markdown content
+  slug: string;
+  title: string;
+  date: string;
+  author: string;
+  authorImage?: any; // Sanity image object for author
+  thumbnail?: any; // Sanity image object
+  description?: string;
+  tags?: string[];
+  body: any; // Portable Text
 }
 
-export interface FrontMatterAttributes {
-    title: string;
-    date: string;
-    author: string;
-    thumbnail?: string;
-    description?: string;
-    tags?: string[];
+export async function getPosts(): Promise<BlogPost[]> {
+  const posts = await client.fetch(`*[_type == "post"] | order(publishedAt desc) {
+    title,
+    "slug": slug.current,
+    "date": publishedAt,
+    "author": author->name,
+    "authorImage": author->image,
+    "thumbnail": mainImage,
+    "description": body[0].children[0].text,
+    "tags": categories[]->title,
+    body
+  }`);
+
+  return posts;
 }
 
-export function getAllPosts(): BlogPost[] {
-    const modules = import.meta.glob('/src/content/blog/*.md', { query: '?raw', import: 'default', eager: true });
+export async function getPost(slug: string): Promise<BlogPost | null> {
+  const post = await client.fetch(`*[_type == "post" && slug.current == $slug][0] {
+    title,
+    "slug": slug.current,
+    "date": publishedAt,
+    "author": author->name,
+    "authorImage": author->image,
+    "thumbnail": mainImage,
+    "tags": categories[]->title,
+    body
+  }`, { slug });
 
-    const posts: BlogPost[] = Object.keys(modules).map((path) => {
-        const slug = path.split('/').pop()?.replace('.md', '') || '';
-        const content = modules[path] as string;
-        const { attributes, body } = frontMatter<FrontMatterAttributes>(content);
-
-        return {
-            slug,
-            title: attributes.title,
-            date: attributes.date,
-            author: attributes.author || 'Gusti Panji Widodo',
-            thumbnail: attributes.thumbnail,
-            description: attributes.description,
-            tags: attributes.tags,
-            body
-        };
-    });
-
-    // Sort by date descending
-    return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-}
-
-export function getPostBySlug(slug: string): BlogPost | undefined {
-    const posts = getAllPosts();
-    return posts.find((post) => post.slug === slug);
+  return post;
 }

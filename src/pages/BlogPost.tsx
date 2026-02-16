@@ -1,21 +1,76 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import { getPostBySlug } from '../utils/blog';
+import { PortableText } from '@portabletext/react';
+import { getPost, type BlogPost as BlogPostType } from '../utils/blog';
+import { urlFor } from '../lib/sanity';
 import { format } from 'date-fns';
 import { ArrowLeft, Clock, User, Calendar } from 'lucide-react';
+
+const ptComponents = {
+    types: {
+        image: ({ value }: any) => {
+            if (!value?.asset?._ref) {
+                return null;
+            }
+            return (
+                <img
+                    src={urlFor(value).width(800).fit('max').auto('format').url()}
+                    alt={value.alt || ' '}
+                    loading="lazy"
+                    className="my-8 rounded-sm border border-white/10"
+                />
+            );
+        },
+        code: ({ value }: any) => {
+            return (
+                <pre className="bg-black border border-white/10 p-4 rounded overflow-auto mb-4 font-mono text-sm">
+                    <code>{value.code}</code>
+                </pre>
+            );
+        }
+    },
+    block: {
+        h1: ({ children }: any) => <h1 className="text-2xl font-bold mb-4 text-white">{children}</h1>,
+        h2: ({ children }: any) => <h2 className="text-xl font-bold mb-3 text-white border-l-2 border-red-500 pl-4">{children}</h2>,
+        normal: ({ children }: any) => <p className="mb-4 text-gray-300 leading-relaxed">{children}</p>,
+        blockquote: ({ children }: any) => <blockquote className="border-l-4 border-gray-600 pl-4 italic text-gray-400 my-4">{children}</blockquote>,
+    },
+    list: {
+        bullet: ({ children }: any) => <ul className="list-disc list-inside mb-4 text-gray-300">{children}</ul>,
+        number: ({ children }: any) => <ol className="list-decimal list-inside mb-4 text-gray-300">{children}</ol>,
+    }
+};
 
 export default function BlogPost() {
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
-    const post = getPostBySlug(slug || '');
+    const [post, setPost] = useState<BlogPostType | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!post) {
-            // Typically we might redirect or show 404
-            // navigate('/blog'); 
+        async function loadPost() {
+            if (!slug) return;
+            try {
+                const data = await getPost(slug);
+                if (data) {
+                    setPost(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch post:", error);
+            } finally {
+                setLoading(false);
+            }
         }
-    }, [post, navigate]);
+        loadPost();
+    }, [slug]);
+
+    if (loading) {
+        return (
+            <div className="min-h-[50vh] flex items-center justify-center font-mono text-gray-500 animate-pulse">
+                // DECRYPTING_DATA_STREAM...
+            </div>
+        );
+    }
 
     if (!post) {
         return (
@@ -48,8 +103,16 @@ export default function BlogPost() {
                             <Clock size={12} />
                             {format(new Date(post.date), 'HH:mm')} LOCAL
                         </span>
-                        <span className="flex items-center gap-1">
-                            <User size={12} />
+                        <span className="flex items-center gap-2">
+                            {post.authorImage ? (
+                                <img
+                                    src={urlFor(post.authorImage).width(24).height(24).url()}
+                                    alt={post.author}
+                                    className="w-6 h-6 rounded-full border border-white/10"
+                                />
+                            ) : (
+                                <User size={12} />
+                            )}
                             {post.author}
                         </span>
                     </div>
@@ -61,7 +124,7 @@ export default function BlogPost() {
                     {post.thumbnail && (
                         <div className="w-full h-64 md:h-96 overflow-hidden border border-white/10 rounded-sm mb-8 bg-white/5">
                             <img
-                                src={post.thumbnail}
+                                src={urlFor(post.thumbnail).width(1200).height(600).url()}
                                 alt={post.title}
                                 className="w-full h-full object-cover opacity-80"
                             />
@@ -71,22 +134,10 @@ export default function BlogPost() {
 
                 {/* Content */}
                 <div className="prose prose-invert prose-red max-w-none font-mono">
-                    <ReactMarkdown
-                        components={{
-                            // Using 'any' cast for now as react-markdown types are complex with the 'node' prop
-                            h1: ({ node, ...props }: any) => <h1 className="text-2xl font-bold mb-4 text-white" {...props} />,
-                            h2: ({ node, ...props }: any) => <h2 className="text-xl font-bold mb-3 text-white border-l-2 border-red-500 pl-4" {...props} />,
-                            p: ({ node, ...props }: any) => <p className="mb-4 text-gray-300 leading-relaxed" {...props} />,
-                            ul: ({ node, ...props }: any) => <ul className="list-disc list-inside mb-4 text-gray-300" {...props} />,
-                            ol: ({ node, ...props }: any) => <ol className="list-decimal list-inside mb-4 text-gray-300" {...props} />,
-                            a: ({ node, ...props }: any) => <a className="text-red-500 hover:underline" {...props} />,
-                            code: ({ node, ...props }: any) => <code className="bg-white/10 text-red-300 px-1 py-0.5 rounded text-sm" {...props} />,
-                            pre: ({ node, ...props }: any) => <pre className="bg-black border border-white/10 p-4 rounded overflow-auto mb-4" {...props} />,
-                            blockquote: ({ node, ...props }: any) => <blockquote className="border-l-4 border-gray-600 pl-4 italic text-gray-400 my-4" {...props} />,
-                        }}
-                    >
-                        {post.body}
-                    </ReactMarkdown>
+                    <PortableText
+                        value={post.body}
+                        components={ptComponents}
+                    />
                 </div>
             </article>
 
