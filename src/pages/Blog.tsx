@@ -5,21 +5,39 @@ import { format } from 'date-fns';
 import { User, Tag } from 'lucide-react';
 
 export default function Blog() {
-    const [activeTab, setActiveTab] = useState<'all' | 'tech' | 'personal'>('all');
+    const [activeTag, setActiveTag] = useState<string>('all');
 
-    // In a real app, we'd filter based on tags/categories in frontmatter.
-    // For now, since we don't have tags in the sample, we'll just show all or mock it.
-    // Let's assume 'layout' or specific tags are used.
-    // For this MVF (Minimum Viable Feature), tabs might just filter by arbitrary logic or be placeholders.
-    // I will add a TODO to implement real filtering.
+    const [currentPage, setCurrentPage] = useState(1);
+    const POSTS_PER_PAGE = 10;
 
     const posts = useMemo(() => getAllPosts(), []);
 
+    // Extract unique tags from all posts
+    const allTags = useMemo(() => {
+        const tags = new Set<string>();
+        posts.forEach(post => {
+            post.tags?.forEach(tag => tags.add(tag));
+        });
+        return ['all', ...Array.from(tags)];
+    }, [posts]);
+
+    // Reset page when tag changes
+    const handleTagChange = (tag: string) => {
+        setActiveTag(tag);
+        setCurrentPage(1);
+    };
+
     const filteredPosts = useMemo(() => {
-        if (activeTab === 'all') return posts;
-        // content filtering logic would go here
-        return posts;
-    }, [activeTab, posts]);
+        if (activeTag === 'all') return posts;
+        return posts.filter(post => post.tags?.includes(activeTag));
+    }, [activeTag, posts]);
+
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+    const currentPosts = filteredPosts.slice(
+        (currentPage - 1) * POSTS_PER_PAGE,
+        currentPage * POSTS_PER_PAGE
+    );
 
     return (
         <div className="max-w-4xl mx-auto px-6 py-12">
@@ -32,25 +50,25 @@ export default function Blog() {
                 </p>
             </div>
 
-            {/* Tabs */}
-            <div className="flex gap-4 mb-8 font-mono text-sm">
-                {['all', 'tech', 'personal'].map((tab) => (
+            {/* Tags Filter */}
+            <div className="flex flex-wrap gap-4 mb-8 font-mono text-sm">
+                {allTags.map((tag) => (
                     <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab as any)}
-                        className={`px-4 py-2 border transition-all uppercase tracking-wider ${activeTab === tab
-                            ? 'border-red-500 text-red-500 bg-red-500/10'
-                            : 'border-white/10 text-gray-500 hover:border-gray-500 hover:text-gray-300'
+                        key={tag}
+                        onClick={() => handleTagChange(tag)}
+                        className={`px-4 py-2 border transition-all uppercase tracking-wider ${activeTag === tag
+                                ? 'border-red-500 text-red-500 bg-red-500/10'
+                                : 'border-white/10 text-gray-500 hover:border-gray-500 hover:text-gray-300'
                             }`}
                     >
-                        {`[ ${tab} ]`}
+                        {`[ ${tag} ]`}
                     </button>
                 ))}
             </div>
 
             {/* Blog List */}
             <div className="space-y-4">
-                {filteredPosts.map((post) => (
+                {currentPosts.map((post) => (
                     <Link
                         key={post.slug}
                         to={`/blog/${post.slug}`}
@@ -70,10 +88,11 @@ export default function Blog() {
                                 <span className="flex items-center gap-1">
                                     <User size={12} /> {post.author}
                                 </span>
-                                {/* Placeholder for tags if we had them */}
-                                <span className="flex items-center gap-1 opacity-50">
-                                    <Tag size={12} /> LOG
-                                </span>
+                                {post.tags && post.tags.length > 0 && (
+                                    <span className="flex items-center gap-1 opacity-50">
+                                        <Tag size={12} /> {post.tags.join(', ')}
+                                    </span>
+                                )}
                             </div>
                         </div>
 
@@ -84,12 +103,37 @@ export default function Blog() {
                     </Link>
                 ))}
 
-                {filteredPosts.length === 0 && (
+                {currentPosts.length === 0 && (
                     <div className="text-center py-12 text-gray-600 font-mono">
                 // NO_DATA_FOUND
                     </div>
                 )}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex justify-between items-center mt-12 pt-6 border-t border-white/10 font-mono text-sm">
+                    <button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className={`px-4 py-2 border border-white/10 hover:border-red-500 hover:text-red-500 transition-colors disabled:opacity-50 disabled:hover:border-white/10 disabled:hover:text-gray-500 disabled:cursor-not-allowed`}
+                    >
+                        &lt; PREV
+                    </button>
+
+                    <span className="text-gray-500">
+                        PAGE {currentPage} / {totalPages}
+                    </span>
+
+                    <button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className={`px-4 py-2 border border-white/10 hover:border-red-500 hover:text-red-500 transition-colors disabled:opacity-50 disabled:hover:border-white/10 disabled:hover:text-gray-500 disabled:cursor-not-allowed`}
+                    >
+                        NEXT &gt;
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

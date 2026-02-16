@@ -7,6 +7,7 @@ export interface BlogPost {
     author: string;
     thumbnail?: string;
     description?: string;
+    tags?: string[];
     body: string; // The raw markdown content
 }
 
@@ -16,6 +17,7 @@ export interface FrontMatterAttributes {
     author: string;
     thumbnail?: string;
     description?: string;
+    tags?: string[];
 }
 
 export function getAllPosts(): BlogPost[] {
@@ -33,6 +35,7 @@ export function getAllPosts(): BlogPost[] {
             author: attributes.author || 'Gusti Panji Widodo',
             thumbnail: attributes.thumbnail,
             description: attributes.description,
+            tags: attributes.tags,
             body
         };
     });

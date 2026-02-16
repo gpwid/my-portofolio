@@ -4,6 +4,7 @@ date: "2026-02-16T14:30:00+07:00"
 author: "Gusti Panji Widodo"
 thumbnail: "/assets/uploads/hello-world.jpg"
 description: "My first blog post on this portfolio."
+tags: ["general", "tech"]
 layout: "blog"
 ---
 
