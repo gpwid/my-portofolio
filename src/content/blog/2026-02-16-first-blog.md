@@ -10,4 +10,4 @@ Hi, first blog. Testing this thing out.
 
 [](https://tenor.com/rJGzLWVqhH2.gif)
 
-![hihi](https://tenor.com/rJGzLWVqhH2.gif)
+![hihi](/assets/uploads/twilight-sparkle-sci-twi.gif)
