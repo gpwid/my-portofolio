@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { PortableText } from '@portabletext/react';
 import { getPost, type BlogPost as BlogPostType } from '../utils/blog';
 import { urlFor } from '../lib/sanity';
@@ -43,7 +43,6 @@ const ptComponents = {
 
 export default function BlogPost() {
     const { slug } = useParams<{ slug: string }>();
-    const navigate = useNavigate();
     const [post, setPost] = useState<BlogPostType | null>(null);
     const [loading, setLoading] = useState(true);
 
