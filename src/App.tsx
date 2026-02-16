@@ -102,6 +102,14 @@ export default function App() {
 
   // Boot Sequence Logic
   useEffect(() => {
+    const hasBooted = sessionStorage.getItem('hasBooted');
+
+    if (hasBooted) {
+      setBootSequence(false);
+      setShowContent(true);
+      return;
+    }
+
     const bootLines: LogEntry[] = [
       { text: "Loading kernel modules...", status: "OK" },
       { text: "Mounting virtual file systems...", status: "OK" },
@@ -120,6 +128,7 @@ export default function App() {
         if (index === bootLines.length - 1) {
           setTimeout(() => {
             setBootSequence(false);
+            sessionStorage.setItem('hasBooted', 'true');
             setTimeout(() => setShowContent(true), 500);
           }, 800);
         }
