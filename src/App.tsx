@@ -3,6 +3,8 @@ import {
   Github,
   Linkedin,
   Download,
+  Menu,
+  X,
 } from 'lucide-react';
 import { Outlet, Link } from 'react-router-dom';
 import logo from './assets/logogpwid.png';
@@ -91,6 +93,7 @@ export default function App() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [showContent, setShowContent] = useState<boolean>(false);
   const [isLogoHovered, setIsLogoHovered] = useState<boolean>(false);
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
   // Contact Form State
   const [emailSubject, setEmailSubject] = useState('');
@@ -179,12 +182,14 @@ export default function App() {
             <img
               src={isLogoHovered ? logoHover : logo}
               alt="Gusti Panji Widodo"
-              className="h-12 w-auto object-contain hover:scale-110 transition-transform duration-300 cursor-pointer"
+              className="h-10 md:h-12 w-auto object-contain hover:scale-110 transition-transform duration-300 cursor-pointer"
               onMouseEnter={() => setIsLogoHovered(true)}
               onMouseLeave={() => setIsLogoHovered(false)}
             />
           </Link>
         </div>
+
+        {/* Desktop Nav */}
         <nav className="hidden md:flex gap-8 text-sm text-gray-400">
           <Link to="/work" className="hover:text-red-500 cursor-pointer hover:underline decoration-red-500 decoration-2 underline-offset-4 transition-colors">
             /work
@@ -193,10 +198,49 @@ export default function App() {
             /blog
           </Link>
         </nav>
-        <button className="flex items-center gap-2 px-4 py-2 border border-red-500 text-red-500 text-xs hover:bg-red-500 hover:text-black transition-all uppercase tracking-wider">
-          Resume.pdf <Download size={14} />
-        </button>
+
+        <div className="flex items-center gap-4">
+          {/* Resume Button - Responsive */}
+          <button className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 border border-red-500 text-red-500 text-xs hover:bg-red-500 hover:text-black transition-all uppercase tracking-wider">
+            <span className="hidden md:inline">Resume.pdf</span>
+            <Download size={14} />
+          </button>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="md:hidden text-gray-400 hover:text-white"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 z-40 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center space-y-8 font-mono text-xl animate-in fade-in slide-in-from-top-10 duration-200 md:hidden">
+          <Link
+            to="/work"
+            className="text-gray-300 hover:text-red-500 border-b border-transparent hover:border-red-500 pb-1 px-4"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            /WORK
+          </Link>
+          <Link
+            to="/blog"
+            className="text-gray-300 hover:text-red-500 border-b border-transparent hover:border-red-500 pb-1 px-4"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            /BLOG
+          </Link>
+          <button
+            className="mt-8 text-gray-500 hover:text-white text-sm flex items-center gap-2"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            [ CLOSE_MENU ]
+          </button>
+        </div>
+      )}
 
       {/* --- PAGE CONTENT --- */}
       <main className="relative pt-24 min-h-screen">
@@ -206,7 +250,7 @@ export default function App() {
       {/* --- FOOTER / CONTACT (Unified Design) --- */}
       <footer className="w-full bg-black border-t border-white/10 p-12 md:p-24 flex flex-col items-center justify-center font-mono relative overflow-hidden min-h-[50vh]">
         {/* Grid bg */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:40px_40px]" />
 
         <div className="relative z-10 w-full max-w-4xl mx-auto text-center">
           <div className="text-red-500 text-xs mb-4">&gt; initiates_contact_sequence</div>
