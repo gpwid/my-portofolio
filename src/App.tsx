@@ -180,6 +180,9 @@ export default function App() {
           <Link to="/work" className="hover:text-red-500 cursor-pointer hover:underline decoration-red-500 decoration-2 underline-offset-4 transition-colors">
             /work
           </Link>
+          <Link to="/blog" className="hover:text-red-500 cursor-pointer hover:underline decoration-red-500 decoration-2 underline-offset-4 transition-colors">
+            /blog
+          </Link>
         </nav>
         <button className="flex items-center gap-2 px-4 py-2 border border-red-500 text-red-500 text-xs hover:bg-red-500 hover:text-black transition-all uppercase tracking-wider">
           Resume.pdf <Download size={14} />
