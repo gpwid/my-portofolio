@@ -1,5 +1,7 @@
 
 import simbaProject from '../assets/simba1.png';
+import portofolioProject from '../assets/portofolio.png'
+import twiappProject from '../assets/twiapp.png'
 
 export interface Project {
     title: string;
@@ -21,27 +23,19 @@ export const projects: Project[] = [
     },
     // Mock projects for testing search/filter
     {
-        title: "Neon City (Game Prototype)",
-        desc: "A cyberpunk-themed platformer game built with Unity.",
-        tags: ["Unity", "C#", "Game Dev"],
-        status: "PROTOTYPE",
-        img: "https://placehold.co/600x400/101010/DC2626?text=Neon+City",
-        link: "#"
+        title: "TwiApp",
+        desc: "TwiApp is a simple, no-nonsense Android app for downloading media from your favorite social platforms directly to your phone's gallery.",
+        tags: ["Kotlin", "Android App"],
+        status: "FINISHED",
+        img: twiappProject,
+        link: "https://github.com/gpwid/twiapp"
     },
     {
-        title: "Portfolio v1",
+        title: "Portfolio Site",
         desc: "The first iteration of my personal portfolio website.",
         tags: ["React", "Tailwind CSS"],
-        status: "ARCHIVED",
-        img: "https://placehold.co/600x400/050505/333333?text=V1",
-        link: "#"
-    },
-    {
-        title: "Network Monitor Script",
-        desc: "Python script for monitoring local network traffic anomalies.",
-        tags: ["Python", "Networking", "Linux"],
         status: "FINISHED",
-        img: "https://placehold.co/600x400/000000/00FF00?text=NetMon",
-        link: "#"
-    }
+        img: portofolioProject,
+        link: "https://github.com/gpwid/my-portofolio"
+    },
 ];
